@@ -1,5 +1,6 @@
 from exp.exp_basic import Exp_Basic
-from models.TimeScaler import TimeScaler, StructuredLoss
+from models.TimeScaler import TimeScaler
+from utils.losses import StructuredLoss
 from utils.tools import EarlyStopping, adjust_learning_rate
 from utils.metrics import metric
 from data_provider.data_factory import data_provider
@@ -49,9 +50,15 @@ class Exp_Main(Exp_Basic):
         return model_optim
     
     def _select_criterion(self):
-        # TimeScaler MUST use StructuredLoss for training
-        criterion = StructuredLoss(alpha=1.0, beta=1.0, gamma=1.0) 
-        return criterion
+            loss_name = getattr(self.args, 'loss', 'smoothL1')
+            
+            criterion = StructuredLoss(
+                loss_name=loss_name,
+                alpha=1.0, 
+                beta=1.0, 
+                gamma=1.0
+            ) 
+            return criterion
 
     def vali(self, vali_data, vali_loader, criterion):
         self.model.eval()        
@@ -67,7 +74,6 @@ class Exp_Main(Exp_Basic):
                 pred = self.model(batch_x, return_decomposition=False)
                 
                 # Use MSE for validation monitoring (Early Stopping)
-                # This ensures we save the model with the best actual forecasting accuracy
                 loss = torch.nn.functional.mse_loss(pred, batch_y)
                 total_loss.append(loss.item())
                 
