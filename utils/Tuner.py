@@ -15,8 +15,8 @@ class Tuner:
         self.n_jobs = n_jobs 
         self.result_dic = defaultdict(list)
         
-        if not os.path.exists('./hyperParameterSearchOutput'):
-            os.makedirs('./hyperParameterSearchOutput')
+        if not os.path.exists('./Output'):
+            os.makedirs('./Output')
             
         self.current_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         
